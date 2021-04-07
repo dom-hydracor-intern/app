@@ -17,7 +17,7 @@ return [
      * Development Mode:
      * true: Errors and warnings shown.
      */
-    'debug' => filter_var(env('DEBUG', false), FILTER_VALIDATE_BOOLEAN),
+    'debug' => true, //filter_var(env('DEBUG', false), FILTER_VALIDATE_BOOLEAN),
 
     /*
      * Configure basic information about the application.
@@ -293,6 +293,11 @@ return [
             'className' => Connection::class,
             'driver' => Mysql::class,
             'persistent' => false,
+            'host' => '206.189.202.188',
+            'username' => 'cgibbs',
+            'password' => 'DomORItNiSeISHOusECE',
+            'database' => 'cake',
+            'encoding' => 'utf8',
             'timezone' => 'UTC',
 
             /*
