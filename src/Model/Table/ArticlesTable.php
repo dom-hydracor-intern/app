@@ -31,12 +31,10 @@ class ArticlesTable extends Table
     {
         $validator
             ->notEmptyString('title')
-            ->minLength('title', 10)
-            ->maxLength('title', 255)
-
+            ->requirePresence('title', 'create')
             ->notEmptyString('body')
-            ->minLength('body', 10);
-
+            ->requirePresence('body', 'create');
+            
         return $validator;
     }
 
