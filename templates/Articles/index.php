@@ -18,7 +18,7 @@
     <tr>
         <td><?= $article->id ?></td>
         <td>
-            <?= $this->Html->link($article->title, ['action' => 'view', $article->slug]) ?>
+            <?= $this->Html->link($article->title, ['action' => 'view', $article->id]) ?>
         </td>
         <td>
             <?= $article->created->format(DATE_RFC850) ?>
