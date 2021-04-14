@@ -12,16 +12,17 @@
         </div>
     </aside>
     <div class="column-responsive column-80">
-        <div class="users form content">
+        <div class="users form">
             <?= $this->Form->create($user) ?>
-            <fieldset>
-                <legend><?= __('Add User') ?></legend>
-                <?php
-                    echo $this->Form->control('email');
-                    echo $this->Form->control('password');
-                ?>
-            </fieldset>
-            <?= $this->Form->button(__('Submit')) ?>
+                <fieldset>
+                    <legend><?= __('Add User') ?></legend>
+                    <?= $this->Form->control('email') ?>
+                    <?= $this->Form->control('password') ?>
+                    <?= $this->Form->control('role', [
+                        'options' => ['admin' => 'Admin', 'author' => 'Author']
+                    ]) ?>
+                </fieldset>
+            <?= $this->Form->button(__('Submit')); ?>
             <?= $this->Form->end() ?>
         </div>
     </div>

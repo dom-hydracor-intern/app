@@ -28,12 +28,16 @@ class User extends Entity
      * @var array
      */
     protected $_accessible = [
-        'email' => true,
-        'password' => true,
-        'created' => true,
-        'modified' => true,
-        'articles' => true,
+        '*' => true,
+        'id' => false
     ];
+
+    protected function _setPassword($password)
+    {
+        if (strlen($password) > 0) {
+            return (new DefaultPasswordHasher)->hash($password);
+        }
+    }
 
     /**
      * Fields that are excluded from JSON versions of the entity.
