@@ -76,6 +76,15 @@ $routes->scope('/', function (RouteBuilder $builder) {
     $builder->fallbacks();
 });
 
+// opening new scope to define routes
+
+$routes->scope('/', function (RouteBuilder $routes) {
+    $routes->setExtensions(['json']);
+    $routes->setExtensions(['xml']);
+    $routes->resources('Recipes');
+});
+
+
 /*
  * If you need a different set of middleware or none at all,
  * open new scope and define routes there.
