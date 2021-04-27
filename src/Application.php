@@ -49,6 +49,8 @@ class Application extends BaseApplication implements AuthenticationServiceProvid
      */
     public function bootstrap(): void
     {
+        $this->addPlugin('ADmad/JwtAuth');
+
         $this->addPlugin('Authentication');
 
         $this->addPlugin('Migrations');
