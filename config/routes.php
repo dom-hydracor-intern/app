@@ -58,7 +58,7 @@ $routes->scope('/', function (RouteBuilder $builder) {
     /*
      * ...and connect the rest of 'Pages' controller's URLs.
      */
-    $builder->connect('/pages/*', 'Pages::display');
+    $builder->connect('/pages/*', 'Pages::display'); // **
 
     /*
      * Connect catchall routes for all controllers.
@@ -81,7 +81,7 @@ $routes->scope('/', function (RouteBuilder $builder) {
 $routes->scope('/', function (RouteBuilder $routes) {
     $routes->setExtensions(['json']);
     $routes->setExtensions(['xml']);
-    $routes->resources('Recipes');
+    $routes->resources('Articles');
 });
 
 
@@ -100,3 +100,14 @@ $routes->scope('/', function (RouteBuilder $routes) {
  * });
  * ```
  */
+
+ // additions
+/*
+Router::prefix('api', function ($routes) {
+    $routes->extensions(['json', 'xml']);
+    $routes->resources('Articles');
+    $routes->resources('Users');
+    Router::connect('/api/users/register', ['controller' => 'Users', 'action' => 'add', 'prefix' => 'api']);
+    $routes->fallbacks('InflectedRoute');
+});
+*/

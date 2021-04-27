@@ -27,6 +27,8 @@ class ArticlesController extends AppController
      */
     public function index()
     {
+        //GET
+        $this->request->allowMethod(['get']);
 
         $allarticles = $this->Articles->find('all')->all();
         $this->set('articles', $allarticles);
@@ -49,6 +51,8 @@ class ArticlesController extends AppController
      */
     public function view($id = null)
     {
+        // GET
+        $this->request->allowMethod(['get']);
         $article = $this->Articles->get($id);
         $this->set('article', $article);
         $this->viewBuilder()->setOption('serialize', ['article']);
@@ -71,7 +75,8 @@ class ArticlesController extends AppController
      */
     public function add()
     {
-        $this->request->allowMethod(['post', 'put', 'get', 'patch']);
+        // POST
+        $this->request->allowMethod(['post']);
         $article = $this->Articles->newEntity($this->request->getData());
        
         if ($this->request->is('post')) 
@@ -125,7 +130,8 @@ class ArticlesController extends AppController
     public function edit($id = null)
     {
 
-        $this->request->allowMethod(['post', 'put', 'get', 'patch']);
+        // PUT
+        $this->request->allowMethod(['put']);
         $article = $this->Articles->get($id);
         $article = $this->Articles->patchEntity($article, $this->request->getData());
         if ($this->Articles->save($article)) {
@@ -172,7 +178,8 @@ class ArticlesController extends AppController
      */
     public function delete($id = null)
     {
-        $this->request->allowMethod(['post', 'put']);
+        // DELETE
+        $this->request->allowMethod(['delete']);
         $article = $this->Articles->get($id);
 
         if(!$this->Articles->delete($article)){
