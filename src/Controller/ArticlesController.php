@@ -125,7 +125,7 @@ class ArticlesController extends AppController
     public function edit($id = null)
     {
 
-        $this->request->allowMethod(['post', 'put']);
+        $this->request->allowMethod(['post', 'put', 'get', 'patch']);
         $article = $this->Articles->get($id);
         $article = $this->Articles->patchEntity($article, $this->request->getData());
         if ($this->Articles->save($article)) {
