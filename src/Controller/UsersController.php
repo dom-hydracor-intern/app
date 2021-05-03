@@ -6,6 +6,12 @@ namespace App\Controller;
 use App\Controller\AppController;
 use Cake\Event\EventInterface;
 
+// code additions
+use Cake\Event\Event;
+use Cake\Network\Exception\UnauthorizedException;
+use Cake\Utility\Security;
+use Firebase\JWT\JWT;
+
 /**
  * Users Controller
  *
@@ -15,34 +21,85 @@ use Cake\Event\EventInterface;
 class UsersController extends AppController
 {
 
+    // method to auto allow action due to "checkAuthIn" configuration
+    // option
+
+    public function initialize(): void
+    {
+        parent::initialize();
+        $this->Auth->allow(['login']);
+    }
+
+
     public function beforeFilter(\Cake\Event\EventInterface $event)
     {
         parent::beforeFilter($event);
         // Configure the login action to not require authentication, preventing
         // the infinite redirect loop issue
-        $this->Authentication->addUnauthenticatedActions(['login']);
+        $this->Authentication->addUnauthenticatedActions(['login','add']);
 
     }
 
     public function login()
     {
+        $date = new \DateTime();
+        
         //REST Methods
         $this->request->allowMethod(['get', 'post']);
         $result = $this->Authentication->getResult();
+
+        if ($this->request->is('post')) 
+        {
+                    
+                $email = $this->request->data('email');
+                $pwd = $this->request->data('password');
+                $token=null;
+                $success=false;
+
+                    /*
+                    method to try JWT encode
+                    */
+
+                    $token = \JWT::encode(
+                        [
+                            'sub' => $user['id'],
+                            'iat' => $date,
+                            'exp' =>  time() + 345600
+                        ],
+                    Security::getSalt());
+
+                    $success = true;
+
+                    $this->set([
+                        'success' => $success,
+                        'data' => [
+                            'token' =>  $token
+                        ],
+                        '_serialize' => ['success', 'data']
+                    ]);
+        }
+
+
         // regardless of POST or GET, redirect if user is logged in
         if ($result->isValid()) {
+
+            $user = $this->Users->patchEntity($user, $this->request->getData());
             // redirect to /articles after login success
             $redirect = $this->request->getQuery('redirect', [
                 'controller' => 'Articles',
                 'action' => 'index',
             ]);
-
+        
+           
             return $this->redirect($redirect);
         }
+
         // display error if user submitted and authentication failed
         if ($this->request->is('post') && !$result->isValid()) {
             $this->Flash->error(__('Invalid email or password'));
         }
+
+       
     }
 
     public function logout()
@@ -66,7 +123,7 @@ class UsersController extends AppController
         $users = $this->paginate($this->Users);
 
         $this->set(compact('users'));
-        
+
         // $this->set('users', $this->Users->find()->all());
     }
 
@@ -83,6 +140,14 @@ class UsersController extends AppController
         $this->set(compact('user'));
     }
 
+
+    // token signature
+    // header.payload.signature
+
+    // $header = 
+    // $token = Auth::getToken();
+
+   // $result = Auth::_decode($token)
     /**
      * Add method
      *
@@ -90,17 +155,53 @@ class UsersController extends AppController
      */
     public function add()
     {
+      
+
         $user = $this->Users->newEmptyEntity();
-        if ($this->request->is('post')) {
+
+        if ($this->request->is('post')) 
+        {
+            $user = $this->Users->patchEntity($user, $this->request->getData());
+                if ($this->Users->save($user)) 
+                {
+                    $this->Flash->success(__('The user has been saved.'));
+                    return $this->redirect(['action' => 'add']);
+                }
+                
+                $this->Flash->error(__('Unable to add the user.'));
+        }
+
+         $this->set('user', $user);
+    }
+
+/*
+// $token = Auth::getToken();
+
             $user = $this->Users->patchEntity($user, $this->request->getData());
             if ($this->Users->save($user)) {
-                $this->Flash->success(__('The user has been saved.'));
                 return $this->redirect(['action' => 'add']);
+
+                
+                    $this->set('data', [
+                        'id' => $user['id'],
+                        'token' => JWT::encode(
+                            [
+                                'sub' => $user['id'],
+                                'iat' => $date,
+                                'exp' =>  time() + 345600
+                            ],
+                        Security::getSalt())
+                    ]);
             }
-            $this->Flash->error(__('Unable to add the user.'));
-        }
-        $this->set('user', $user);
-    }
+
+        
+
+*/
+     //  
+      //  $this->set('bearer', ['id', 'data']);
+
+
+    
 
     /**
      * Edit method
@@ -145,4 +246,5 @@ class UsersController extends AppController
 
         return $this->redirect(['action' => 'index']);
     }
+
 }

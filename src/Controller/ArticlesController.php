@@ -28,7 +28,7 @@ class ArticlesController extends AppController
     public function index()
     {
         //GET
-        $this->request->allowMethod(['get']);
+       // $this->request->allowMethod(['get']);
 
         $allarticles = $this->Articles->find('all')->all();
         $this->set('articles', $allarticles);
@@ -55,7 +55,7 @@ class ArticlesController extends AppController
         $this->request->allowMethod(['get']);
         $article = $this->Articles->get($id);
         $this->set('article', $article);
-        $this->viewBuilder()->setOption('serialize', ['article']);
+        $this->viewBuilder()->setOption('serialize', ['article'], true);
 
     /*
 
@@ -201,4 +201,5 @@ class ArticlesController extends AppController
         }
     */
     }
+
 }

@@ -58,7 +58,7 @@ $routes->scope('/', function (RouteBuilder $builder) {
     /*
      * ...and connect the rest of 'Pages' controller's URLs.
      */
-    $builder->connect('/pages/*', 'Pages::display'); // **
+    $builder->connect('/articles/*', 'Articles::index'); // **
 
     /*
      * Connect catchall routes for all controllers.
@@ -79,11 +79,21 @@ $routes->scope('/', function (RouteBuilder $builder) {
 // opening new scope to define routes
 
 $routes->scope('/', function (RouteBuilder $routes) {
-    $routes->setExtensions(['json']);
-    $routes->setExtensions(['xml']);
+    $routes->setExtensions(['json',
+    'xml']);
     $routes->resources('Articles');
 });
 
+/*
+$routes->scope('/api', function (RouteBuilder $builder) {
+         
+         $builder->setExtensions(['json', 'xml']);
+         $builder->resources('Users');
+         $builder->connect('/api/users/add', ['controller' => 'Users', 'action' => 'add']);
+         $builder->fallbacks('InflectedRoute');
+     });
+
+     */
 
 /*
  * If you need a different set of middleware or none at all,
