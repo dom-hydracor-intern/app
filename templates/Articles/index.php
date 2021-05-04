@@ -33,4 +33,6 @@
         </td>
     </tr>
     <?php endforeach; ?>
+    <p><?= $this->Html->link('User Logout', ['controller' => 'Users',
+                'action' => 'logout']) ?></p>
 </table>
