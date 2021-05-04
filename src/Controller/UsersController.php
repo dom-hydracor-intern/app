@@ -174,31 +174,7 @@ class UsersController extends AppController
          $this->set('user', $user);
     }
 
-/*
 // $token = Auth::getToken();
-
-            $user = $this->Users->patchEntity($user, $this->request->getData());
-            if ($this->Users->save($user)) {
-                return $this->redirect(['action' => 'add']);
-
-                
-                    $this->set('data', [
-                        'id' => $user['id'],
-                        'token' => JWT::encode(
-                            [
-                                'sub' => $user['id'],
-                                'iat' => $date,
-                                'exp' =>  time() + 345600
-                            ],
-                        Security::getSalt())
-                    ]);
-            }
-
-        
-
-*/
-     //  
-      //  $this->set('bearer', ['id', 'data']);
 
 
     
