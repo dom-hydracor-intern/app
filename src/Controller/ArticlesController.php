@@ -18,6 +18,8 @@ class ArticlesController extends AppController
         parent::initialize();
         $this->loadComponent('RequestHandler'); // Include the RequestHandler
         $this->loadComponent('Flash'); // Include the FlashComponent
+
+        $this->Auth->allow(['index']);
     }
 
     /**

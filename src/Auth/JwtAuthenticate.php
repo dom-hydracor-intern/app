@@ -13,6 +13,8 @@ use Cake\Utility\Security;
 use Exception;
 use Firebase\JWT\JWT;
 
+// logic for each request
+
 /**
  * An authentication adapter for authenticating using JSON Web Tokens.
  *

@@ -27,7 +27,7 @@ class UsersController extends AppController
     public function initialize(): void
     {
         parent::initialize();
-        $this->Auth->allow(['login']);
+        $this->Auth->allow(['login', 'logout']);
     }
 
 
@@ -42,6 +42,7 @@ class UsersController extends AppController
 
     public function login()
     {
+        $user = $this->Users->newEmptyEntity();
         $date = new \DateTime();
         
         //REST Methods
@@ -50,9 +51,7 @@ class UsersController extends AppController
 
         if ($this->request->is('post')) 
         {
-                    
-                $email = $this->request->data('email');
-                $pwd = $this->request->data('password');
+                
                 $token=null;
                 $success=false;
 
@@ -60,7 +59,7 @@ class UsersController extends AppController
                     method to try JWT encode
                     */
 
-                    $token = \JWT::encode(
+                    $token = JWT::encode(
                         [
                             'sub' => $user['id'],
                             'iat' => $date,
@@ -77,13 +76,15 @@ class UsersController extends AppController
                         ],
                         '_serialize' => ['success', 'data']
                     ]);
+
+                    // success = 1 or 'success' = true
         }
 
 
         // regardless of POST or GET, redirect if user is logged in
         if ($result->isValid()) {
 
-            $user = $this->Users->patchEntity($user, $this->request->getData());
+            // $user = $this->Users->patchEntity($user, $this->request->getData());
             // redirect to /articles after login success
             $redirect = $this->request->getQuery('redirect', [
                 'controller' => 'Articles',
