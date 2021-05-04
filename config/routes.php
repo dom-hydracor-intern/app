@@ -53,6 +53,11 @@ $routes->scope('/', function (RouteBuilder $builder) {
 
     // $builder->connect('/', ['controller' => 'Pages', 'action' => 'display', 'home']);
 
+    
+    $builder->setExtensions(['json', 'xml']);
+
+    $builder->resources('Articles');
+
     $builder->connect('/', ['controller' => 'Articles', 'action' => 'index']);
     
     /*
@@ -76,24 +81,16 @@ $routes->scope('/', function (RouteBuilder $builder) {
     $builder->fallbacks();
 });
 
-// opening new scope to define routes
-
-$routes->scope('/', function (RouteBuilder $routes) {
-    $routes->setExtensions(['json',
-    'xml']);
-    $routes->resources('Articles');
-});
 
 /*
 $routes->scope('/api', function (RouteBuilder $builder) {
-         
          $builder->setExtensions(['json', 'xml']);
          $builder->resources('Users');
          $builder->connect('/api/users/add', ['controller' => 'Users', 'action' => 'add']);
+         $builder->connect('/api/users/login', ['controller' => 'Users', 'action' => 'login']);
          $builder->fallbacks('InflectedRoute');
      });
-
-     */
+*/
 
 /*
  * If you need a different set of middleware or none at all,
