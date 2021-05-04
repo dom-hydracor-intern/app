@@ -38,6 +38,11 @@ class UsersController extends AppController
         // the infinite redirect loop issue
         $this->Authentication->addUnauthenticatedActions(['login','add']);
 
+        if($this->RequestHandler->accepts('html')){
+
+           header('Authentication', $bearer);
+        }
+
     }
 
     public function login()
@@ -68,14 +73,19 @@ class UsersController extends AppController
                     Security::getSalt());
 
                     $success = true;
-
+                    
+                    $bearer = JWT::jsonEncode($token);
+                    
                     $this->set([
+                        'bearer' => $bearer,
                         'success' => $success,
                         'data' => [
                             'token' =>  $token
                         ],
                         '_serialize' => ['success', 'data']
                     ]);
+                    
+                    
 
                     // success = 1 or 'success' = true
         }
