@@ -14,9 +14,10 @@ declare(strict_types=1);
  * @since     0.2.9
  * @license   https://opensource.org/licenses/mit-license.php MIT License
  */
-namespace App\Controller;
+namespace App\Controller\Api;
 
 use Cake\Controller\Controller;
+use Cake\Event\Event;
 
 /**
  * Application Controller
@@ -29,6 +30,7 @@ use Cake\Controller\Controller;
 class AppController extends Controller
 {
 
+    use Cake\Controller\ControllerTrait;
 
     public function beforeFilter(\Cake\Event\EventInterface $event)
     {
@@ -48,7 +50,7 @@ class AppController extends Controller
      */
 
 
-    public function initialize(): void
+    public function initialize()
     {
         parent::initialize();
 

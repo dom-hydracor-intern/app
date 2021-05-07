@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace App\Controller;
+namespace App\Controller\Api;
 
 use App\Controller\AppController;
 use Cake\Event\EventInterface;
@@ -11,6 +11,7 @@ use Cake\Event\Event;
 use Cake\Network\Exception\UnauthorizedException;
 use Cake\Utility\Security;
 use Firebase\JWT\JWT;
+use App\Controller\Api;
 
 /**
  * Users Controller
@@ -21,16 +22,14 @@ use Firebase\JWT\JWT;
 class UsersController extends AppController
 {
 
-    // method to auto allow action due to "checkAuthIn" configuration
-    // option
-
-    public function initialize(): void
+    public function initialize()
     {
         parent::initialize();
+        $this->Auth->allow(['add', 'token']);
         
-        $this->Auth->allow(['login', 'logout']);
     }
 
+  
 
     public function beforeFilter(\Cake\Event\EventInterface $event)
     {
@@ -38,15 +37,52 @@ class UsersController extends AppController
 
         // Configure the login action to not require authentication, preventing
         // the infinite redirect loop issue
-        $this->Authentication->addUnauthenticatedActions(['login','add']);
+        
 
+        $this->Authentication->addUnauthenticatedActions(['login']);
+   
         header('Authorization: Bearer <token>', true, 1);
 
     }
 
     public function login()
     {
-        
+        if ($this->request->is('post')) 
+        {
+                
+                $token=null;
+                $success=false;
+
+                    /*
+                    method to try JWT encode
+                    */
+
+                    $token = JWT::encode(
+                        [
+                            'sub' => $user['id'],
+                            'iat' => $date,
+                            'exp' =>  time() + 345600
+                        ],
+                    Security::getSalt());
+
+                    $success = true;
+                    
+                    $bearer = JWT::jsonEncode($token);
+                    
+                    $this->set([
+                        'bearer' => $bearer,
+                        'success' => $success,
+                        'data' => [
+                            'token' =>  $token
+                        ],
+                        '_serialize' => ['success', 'data']
+                    ]);
+                    
+                    
+
+                    // success = 1 or 'success' = true
+        }
+
         //REST Methods
         $this->request->allowMethod(['get', 'post']);
         $result = $this->Authentication->getResult();
@@ -141,9 +177,38 @@ class UsersController extends AppController
                 }
                 
                 $this->Flash->error(__('Unable to add the user.'));
+    
+
+                $token=null;
+                $success=false;
+
+                    /*
+                    method to try JWT encode
+                    */
+
+                    $token = JWT::encode(
+                        [
+                            'sub' => $user['id'],
+                            'iat' => $date,
+                            'exp' =>  time() + 345600
+                        ],
+                    Security::getSalt());
+
+                    $success = true;
+                    
+                
+                    
+                $this->set([
+                    'success' => $success,
+                    'data' => [
+                    'token' =>  $token
+                ],
+                'user', $user]);
+
         }
 
-         $this->set('user', $user);
+        $this->viewBuilder()->setOption('serialize', ['success','user','data']);
+
     }
 
 
@@ -194,4 +259,41 @@ class UsersController extends AppController
         return $this->redirect(['action' => 'index']);
     }
 
+    public function token()
+    {
+        $user = $this->Auth->identify();
+        if (!$user) {
+            throw new UnauthorizedException('Invalid username or password');
+        }
+
+                $token=null;
+                $success=false;
+
+                    /*
+                    method to try JWT encode
+                    */
+
+                    $token = JWT::encode(
+                        [
+                            'sub' => $user['id'],
+                            'iat' => $date,
+                            'exp' =>  time() + 345600
+                        ],
+                    Security::getSalt());
+
+                    $success = true;
+                    
+                
+                    
+                $this->set([
+                    'success' => $success,
+                    'data' => [
+                    'token' =>  $token
+                ],
+                'user', $user]);
+
+        }
+
+        $this->viewBuilder()->setOption('serialize', ['success','data']);
+    }
 }
