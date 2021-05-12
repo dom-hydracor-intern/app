@@ -83,7 +83,6 @@ class AppController extends Controller
             'checkAuthIn' => 'Controller.initialize'
         ]);
 
-        header('Authorization: Bearer <token>', true, 1);
  
         /*
          * Enable the following component for recommended CakePHP form protection settings.
