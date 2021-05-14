@@ -62,7 +62,6 @@ $routes->scope('/', function (RouteBuilder $builder) {
     $builder->connect('/users/logout', ['controller' => 'Users', 'action' => 'logout']);
 
     
-    $builder->connect('/api/add', ['controller' => 'Api', 'action' => 'add']);
 
     $builder->resources('Articles');
     $builder->resources('Users');
@@ -83,13 +82,13 @@ $routes->scope('/', function (RouteBuilder $builder) {
     $builder->fallbacks(DashedRoute::class);
 });
 
-Router::prefix('api', function ($routes) {
-    $routes->setExtensions(['json']);
-    $routes->resources('Users');
-    $routes->connect('/api/login', ['controller' => 'Users', 'action' => 'login', 'prefix' => 'api']);
-    $routes->connect('/api/add', ['controller' => 'Api', 'action' => 'add', 'prefix' => 'api']);
+$routes->prefix('api', function (RouteBuilder $builder) {
+    $builder->setExtensions(['json']);
+    $builder->resources('Users');
+    $builder->connect('/users/login', ['controller' => 'Users', 'action' => 'login', 'prefix' => 'api']);
+    $builder->connect('/users/token', ['controller' => 'Users', 'action' => 'token', 'prefix' => 'api']);
     
-    $routes->fallbacks('InflectedRoute');
+    $builder->fallbacks('InflectedRoute');
 });
 
 
