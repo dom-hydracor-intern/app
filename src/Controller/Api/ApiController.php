@@ -1,54 +1,32 @@
 <?php
-declare(strict_types=1);
-
 namespace App\Controller\Api;
 
-use App\Controller\AppController;
-use Cake\Event\EventInterface;
-
-// code additions
 use Cake\Event\Event;
 use Cake\Network\Exception\UnauthorizedException;
 use Cake\Utility\Security;
 use Firebase\JWT\JWT;
-use App\Controller\Api;
+use Cake\Http\ServerRequest;
+use Cake\I18n\Time;
 
-/**
- * Users Controller
- *
- * @property \App\Model\Table\UsersTable $Users
- * @method \App\Model\Entity\User[]|\Cake\Datasource\ResultSetInterface paginate($object = null, array $settings = [])
- */
-class UsersController extends AppController
+class ApiController extends AppController
 {
 
-    public function initialize()
+    public function initialize(): void
     {
         parent::initialize();
-        $this->Auth->allow(['add', 'token']);
         
-    }
+        $this->loadComponent('RequestHandler'); //Enable data view
 
-  
-
-    public function beforeFilter(\Cake\Event\EventInterface $event)
-    {
-        parent::beforeFilter($event);
-
-        // Configure the login action to not require authentication, preventing
-        // the infinite redirect loop issue
-        
-
+        $this->Auth->allow(['login', 'token']);
         $this->Authentication->addUnauthenticatedActions(['login','token']);
-   
-        
-        // header($token, true);
 
     }
 
+    /* Your service code here*/
+    
     public function login()
     {
-        $newToken = $this->request->getParam('Authentication');
+        // $newToken = $this->request->getParam('Authentication');
 
         //$title = $this->request->getData('data');
         
@@ -56,60 +34,54 @@ class UsersController extends AppController
         //REST Methods
         $this->request->allowMethod(['get', 'post']);
         
-        
-        // redirect to /articles after login success
         $redirect = $this->request->getQuery('redirect', [
             'controller' => 'Articles',
             'action' => 'index',
         ]);
-            
 
-            
-        $result = $this->Authentication->getResult();
+        if ($this->request->is('post')) {
+                $user = $this->Auth->identify();
+            if ($user) {
+                $this->Auth->setUser($user);
 
+                $token=null;
+                $success=false;
+                $key=Security::getSalt();
 
-        // regardless of POST or GET, redirect if user is logged in
-        if ($result->isValid()) {
-
-            
-        $token=null;
-        $success=false;
-
-            /*
-            method to try JWT encode
-            */
+                /*
+                method to try JWT encode
+                */
 
 
-            $success = true;
-            
-           // $token=JWT::jsonEncode($token);
-            
-        $this->set([
-            'success' => $success,
-            'data' => [
-            'token' =>  JWT::encode(
-                [
-                    'sub' => $user['id'],
-                    'iat' => $date,
-                    'exp' =>  time() + 345600
-                ],
-            Security::getSalt())],
-            '_serialize' => ['success', 'data']
-        ]);
+                $success = true;
+                
+                // $token=JWT::jsonEncode($token);
+                
+                $this->set([
+                'success' => $success,
+                'data' => [
+                'token' =>  JWT::encode(
+                    [
+                        'sub' => $user['id'],
+                        'iat' => $date,
+                        'exp' =>  time() + 345600
+                    ], 
+                    
+                $key
+                )],
+                '_serialize' => ['success', 'data']
+                ]);
 
-
-        $this->viewBuilder()->setOption('serialize', ['success','user','data']);
-        
-           
-            return $this->redirect($redirect);
+                return $this->redirect($redirect);
+            }
+            else {
+            $this->Flash->error(__('Auth error. Invalid login'));
+            }
         }
 
-        // display error if user submitted and authentication failed
-        else ($this->request->is('post') && !$result->isValid()) {
-            $this->Flash->error(__('Invalid email or password'));
-        }
+        $this->set('articles', $this->paginate($this->Articles));
+        $this->viewBuilder()->setOption('serialize', ['success', 'data'], true);
 
-       
     }
 
     public function logout()
@@ -133,6 +105,7 @@ class UsersController extends AppController
         $users = $this->paginate($this->Users);
 
         $this->set(compact('users'));
+        $this->set('_serialize', ['users']);
 
         // $this->set('users', $this->Users->find()->all());
     }
@@ -147,7 +120,8 @@ class UsersController extends AppController
     public function view($id)
     {
         $user = $this->Users->get($id);
-        $this->set(compact('user'));
+        $this->set('user', $user);
+        $this->set('_serialize', ['user']);
     }
 
 
@@ -165,7 +139,6 @@ class UsersController extends AppController
      */
     public function add()
     {
-      
 
         $user = $this->Users->newEmptyEntity();
 
@@ -174,15 +147,20 @@ class UsersController extends AppController
             $user = $this->Users->patchEntity($user, $this->request->getData());
                 if ($this->Users->save($user)) 
                 {
+                    $msg = 'The user has been saved.';
                     $this->Flash->success(__('The user has been saved.'));
                     return $this->redirect(['action' => 'add']);
                 }
-                
+                $msg = 'The user could not be saved. Please, try again.';
                 $this->Flash->error(__('Unable to add the user.'));
     
             }
 
-            $this->set('user', $user);
+            extract($msg);
+            
+            $this->set('msg');
+
+            $this->viewBuilder()->setOption('serialize', ['user', 'msg']);
 
     }
 
@@ -233,7 +211,7 @@ class UsersController extends AppController
 
         return $this->redirect(['action' => 'index']);
     }
-
+/*
     public function token()
     {
         $user = $this->Auth->identify();
@@ -245,9 +223,9 @@ class UsersController extends AppController
         $token=null;
         $success=false;
 
-            /*
+            
             method to try JWT encode
-            */
+            
 
             $token = JWT::encode(
                 [
@@ -264,9 +242,9 @@ class UsersController extends AppController
             'success' => $success,
             'data' => [
             'token' =>  $token,
-            Security::getSalt()),
-            '_serialize' => ['success', 'data']
-        ],
+            Security::getSalt()
+            
+        ],'_serialize' => ['success', 'data']
         'user', $user]);
         
 
@@ -274,4 +252,6 @@ class UsersController extends AppController
 
         header('Authorization: Bearer <token>', true, 1); 
     }
+
+    */
 }

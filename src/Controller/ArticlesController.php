@@ -16,6 +16,7 @@ class ArticlesController extends AppController
         parent::initialize();
 
         $this->loadComponent('Flash'); // Include the FlashComponent
+        $this->loadComponent('RequestHandler'); //Enable data view
     }
 
     /**
@@ -25,9 +26,19 @@ class ArticlesController extends AppController
      */
     public function index()
     {
+        /*
         $articles = $this->paginate($this->Articles);
 
         $this->set(compact('articles'));
+        $this->set([
+            '_serialize' => ['articles']
+        ]);
+*/
+
+        $this->set('articles', $this->paginate($this->Articles));
+        
+        $this->set('_serialize', ['articles']);
+        $this->viewBuilder()->setOption('serialize', 'articles', true);
     }
 
     /**

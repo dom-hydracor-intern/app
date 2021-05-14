@@ -23,6 +23,7 @@
 
 use Cake\Routing\Route\DashedRoute;
 use Cake\Routing\RouteBuilder;
+use Cake\Routing\Router;
 
 /*
  * The default class to use for all routes
@@ -50,9 +51,21 @@ $routes->scope('/', function (RouteBuilder $builder) {
      * its action called 'display', and we pass a param to select the view file
      * to use (in this case, templates/Pages/home.php)...
      */
+    $builder->setExtensions(['json','xml']);
+    $builder->connect('/articles/*', 'Articles::index'); 
     $builder->connect('/', ['controller' => 'Articles', 'action' => 'index']);
+    
+    
+    $builder->connect('/articles/view/:id', ['controller' => 'Articles', 'action' => 'view', 'id' => null], ['setPass' => ['id']]);
+    
+    $builder->connect('/users/login', ['controller' => 'Users', 'action' => 'login']);
+    $builder->connect('/users/logout', ['controller' => 'Users', 'action' => 'logout']);
 
+    
+    $builder->connect('/api/add', ['controller' => 'Api', 'action' => 'add']);
 
+    $builder->resources('Articles');
+    $builder->resources('Users');
 
     /*
      * Connect catchall routes for all controllers.
@@ -67,8 +80,18 @@ $routes->scope('/', function (RouteBuilder $builder) {
      * You can remove these routes once you've connected the
      * routes you want in your application.
      */
-    $builder->fallbacks();
+    $builder->fallbacks(DashedRoute::class);
 });
+
+Router::prefix('api', function ($routes) {
+    $routes->setExtensions(['json']);
+    $routes->resources('Users');
+    $routes->connect('/api/login', ['controller' => 'Users', 'action' => 'login', 'prefix' => 'api']);
+    $routes->connect('/api/add', ['controller' => 'Api', 'action' => 'add', 'prefix' => 'api']);
+    
+    $routes->fallbacks('InflectedRoute');
+});
+
 
 /*
  * If you need a different set of middleware or none at all,
@@ -85,10 +108,3 @@ $routes->scope('/', function (RouteBuilder $builder) {
  * });
  * ```
  */
-
-$routes->scope('/api', function (RouteBuilder $builder) {
-    $builder->setExtensions(['json', 'xml']);
-    $builder->resources('Users');
-    $builder->connect('/api/users/add', ['controller' => 'Users', 'action' => 'add', 'prefix' => 'api']);
-    $builder->fallbacks('InflectedRoute');
-});

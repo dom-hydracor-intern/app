@@ -39,8 +39,18 @@ class UsersController extends AppController
             return $this->redirect($redirect);
         }
         // display error if user submitted and authentication failed
-        if ($this->request->is('post') && !$result->isValid()) {
+        else {
             $this->Flash->error(__('Invalid email or password'));
+        }
+        if ($this->request->is('post')) {
+
+                $user = $this->Auth->identify();
+
+            if ($user) {
+                $this->Auth->setUser($user);
+                return $this->redirect($redirect);
+            }
+            $this->Flash->error(__('Auth error'));
         }
     }
 
