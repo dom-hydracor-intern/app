@@ -52,15 +52,10 @@ $routes->scope('/', function (RouteBuilder $builder) {
      * to use (in this case, templates/Pages/home.php)...
      */
     $builder->setExtensions(['json','xml']);
-    $builder->connect('/articles/*', 'Articles::index'); 
     $builder->connect('/', ['controller' => 'Articles', 'action' => 'index']);
     
     $builder->connect('/articles/add/', ['controller' => 'Articles', 'action' => 'add']);
-    $builder->connect('/articles/delete/{id}', ['controller' => 'Articles', 'action' => 'delete'])
-          //  ->setPass('id')
-            ->setPatterns([
-                'id' => '[0-9]+',
-            ]);
+    $builder->connect('/articles/delete/*', ['controller' => 'Articles', 'action' => 'delete']);
     $builder->connect('/articles/index', ['controller' => 'Articles', 'action' => 'index']);
 
 
@@ -93,11 +88,12 @@ $routes->scope('/', function (RouteBuilder $builder) {
 $routes->prefix('api', function (RouteBuilder $builder) {
     $builder->setExtensions(['json']);
     $builder->resources('Users');
+    $builder->resources('Articles');
     $builder->connect('/users/add', ['controller' => 'Users', 'action' => 'add', 'prefix' => 'Api']);
     $builder->connect('/users/login', ['controller' => 'Users', 'action' => 'login', 'prefix' => 'Api']);
     $builder->connect('/users/token', ['controller' => 'Users', 'action' => 'token', 'prefix' => 'Api']);
     $builder->connect('/articles/add/', ['controller' => 'Articles', 'action' => 'add', 'prefix' => 'Api']);
-    $builder->connect('/articles/delete/:id', ['controller' => 'Articles', 'action' => 'delete', 'prefix' => 'Api']);
+    $builder->connect('/articles/delete/*', ['controller' => 'Articles', 'action' => 'delete', 'prefix' => 'Api']);
     $builder->connect('/articles/index', ['controller' => 'Articles', 'action' => 'index', 'prefix' => 'Api']);
     $builder->fallbacks('InflectedRoute');
 });
