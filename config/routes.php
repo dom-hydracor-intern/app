@@ -57,7 +57,7 @@ $routes->scope('/', function (RouteBuilder $builder) {
     
     $builder->connect('/articles/add/', ['controller' => 'Articles', 'action' => 'add']);
     $builder->connect('/articles/delete/{id}', ['controller' => 'Articles', 'action' => 'delete'])
-            ->setPass('id')
+          //  ->setPass('id')
             ->setPatterns([
                 'id' => '[0-9]+',
             ]);
