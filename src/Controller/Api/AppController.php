@@ -80,6 +80,7 @@ class AppController extends Controller
             'checkAuthIn' => 'Controller.initialize'
         ]);
 
+        $this->Auth->allow(['token','add']);
  
         /*
          * Enable the following component for recommended CakePHP form protection settings.

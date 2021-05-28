@@ -1,7 +1,17 @@
 <?php
 declare(strict_types=1);
 
-namespace App\Controller;
+namespace App\Controller\Api;
+
+
+
+use Cake\Event\Event;
+use Cake\Network\Exception\UnauthorizedException;
+use Cake\Utility\Security;
+use Firebase\JWT\JWT;
+use Cake\Http\ServerRequest;
+use Cake\I18n\Time;
+
 
 /**
  * Articles Controller
@@ -17,6 +27,8 @@ class ArticlesController extends AppController
 
         $this->loadComponent('Flash'); // Include the FlashComponent
         $this->loadComponent('RequestHandler'); //Enable data view
+
+        $this->Auth->allow(['index','delete']);
     }
 
     /**
@@ -26,29 +38,17 @@ class ArticlesController extends AppController
      */
     public function index()
     {
+        header('Access-Control-Allow-Origin: *');
+        header('Access-Control-Allow-Methods: POST, GET');
+        header('Access-Control-Allow-Headers: *');
+
+        $this->request->allowMethod(['get']);
 
         $this->set('articles', $this->paginate($this->Articles));
         
-        $this->set('_serialize', ['articles']);
-        $this->viewBuilder()->setOption('serialize', 'articles', true);
+        $this->viewBuilder()->setOption('serialize', 'articles');
 
-            
-    }
-
-    /**
-     * View method
-     *
-     * @param string|null $id Article id.
-     * @return \Cake\Http\Response|null|void Renders view
-     * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
-     */
-    public function view($id = null)
-    {
-        $article = $this->Articles->get($id, [
-            'contain' => [],
-        ]);
-
-        $this->set(compact('article'));
+        $this->RequestHandler->renderAs($this, 'json');
     }
 
     /**
@@ -58,12 +58,18 @@ class ArticlesController extends AppController
      */
     public function add()
     {
+        header('Access-Control-Allow-Origin: *');
+        header('Access-Control-Allow-Methods: POST, GET');
+        header('Access-Control-Allow-Headers: *');
+
+        $this->request->allowMethod('post');
+        
         $article = $this->Articles->newEmptyEntity();
         if ($this->request->is('post')) {
             $article = $this->Articles->patchEntity($article, $this->request->getData());
             if ($this->Articles->save($article)) {
                 $this->Flash->success(__('Your article has been saved.'));
-                return $this->redirect(['action' => 'index']);
+                
             }
             $this->Flash->error(__('Unable to add your article.'));
         }
@@ -73,30 +79,10 @@ class ArticlesController extends AppController
         // one category for an article
         $categories = $this->Articles->Categories->find('treeList')->all();
         $this->set(compact('categories'));
-    }
 
-    /**
-     * Edit method
-     *
-     * @param string|null $id Article id.
-     * @return \Cake\Http\Response|null|void Redirects on successful edit, renders view otherwise.
-     * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
-     */
-    public function edit($id = null)
-    {
-        $article = $this->Articles->get($id, [
-            'contain' => [],
-        ]);
-        if ($this->request->is(['patch', 'post', 'put'])) {
-            $article = $this->Articles->patchEntity($article, $this->request->getData());
-            if ($this->Articles->save($article)) {
-                $this->Flash->success(__('Your article has been updated.'));
+        $this->viewBuilder()->setOption('serialize', 'article');
+        $this->RequestHandler->renderAs($this, 'json');
 
-                return $this->redirect(['action' => 'index']);
-            }
-            $this->Flash->error(__('Unable to update your article.'));
-        }
-        $this->set('article', $article);
     }
 
     /**
@@ -108,12 +94,19 @@ class ArticlesController extends AppController
      */
     public function delete($id = null)
     {
-        $this->request->allowMethod(['post', 'delete']);
+
+        header('Access-Control-Allow-Origin: *');
+        header('Access-Control-Allow-Methods: POST, DELETE');
+        header('Access-Control-Allow-Headers: Origin, Content-Type, Authorization');
+
+        $this->request->allowMethod(['post','delete']);
         $article = $this->Articles->get($id);
         if ($this->Articles->delete($article)) {
             $this->Flash->success(__('The article with id: {0} has been deleted.', h($id)));
         } else {
             $this->Flash->error(__('The article could not be deleted. Please, try again.'));
         }
+
+        $this->RequestHandler->renderAs($this, 'json');
     }
 }

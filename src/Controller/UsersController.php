@@ -42,6 +42,7 @@ class UsersController extends AppController
         else {
             $this->Flash->error(__('Invalid email or password'));
         }
+        
         if ($this->request->is('post')) {
 
                 $user = $this->Auth->identify();
